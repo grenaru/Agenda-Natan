@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Agenda Operacional Premium</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    /* Substituição por fontes nativas modernas e limpas */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    /* Padrão Azul Escuro Premium */
+    background: linear-gradient(135deg, #0a192f 0%, #020c1b 100%);
+    color: white;
+    overflow-x:hidden;
+    min-height: 100vh;
+}
+
+/* Removido o pseudo-elemento ::before que carregava a imagem do Unsplash */
+
+.container{
+
+    width:95%;
+
+    max-width:520px;
+
+    margin:auto;
+
+    padding:20px;
+
+}
+
+.top{
+
+    text-align:center;
+
+    margin-top:25px;
+
+}
+
+.clock{
+
+    font-size:68px;
+
+    font-weight:200;
+
+    letter-spacing:-3px;
+
+}
+
+.date{
+
+    opacity:0.85;
+
+    font-size:18px;
+
+    text-transform:capitalize;
+
+}
+
+.card{
+
+    margin-top:22px;
+
+    /* Ajustado para contrastar perfeitamente com o novo fundo azul */
+    background: rgba(23, 42, 69, 0.4);
+
+    border-radius:32px;
+
+    backdrop-filter:blur(22px);
+
+    padding:22px;
+
+    border:1px solid rgba(100, 255, 218, 0.08);
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,0.5),
+        inset 0 1px 1px rgba(255,255,255,0.05);
+
+}
+
+.calendar-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.calendar-header button{
+
+    background:none;
+
+    border:none;
+
+    color:white;
+
+    font-size:22px;
+
+    cursor:pointer;
+
+    width:42px;
+
+    height:42px;
+
+    border-radius:50%;
+
+    transition:0.3s;
+
+}
+
+.calendar-header button:hover{
+
+    background:rgba(255,255,255,0.08);
+
+}
+
+.month{
+
+    font-weight:700;
+
+    font-size:20px;
+
+}
+
+.weekdays,
+.days{
+
+    display:grid;
+
+    grid-template-columns:repeat(7,1fr);
+
+    text-align:center;
+
+}
+
+.weekdays{
+
+    margin-bottom:12px;
+
+    opacity:0.55;
+
+    font-size:12px;
+
+    font-weight:600;
+
+}
+
+.day{
+
+    height:60px;
+
+    position:relative;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    cursor:pointer;
+
+}
+
+.day-number{
+
+    width:44px;
+
+    height:44px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    transition:0.25s;
+
+    background:rgba(255,255,255,0.03);
+
+    border:1px solid rgba(255,255,255,0.05);
+
+    backdrop-filter:blur(8px);
+
+}
+
+.day:hover .day-number{
+
+    transform:scale(1.12);
+
+}
+
+.today{
+
+    background:#2196f3 !important;
+
+    box-shadow:
+        0 0 20px rgba(33,150,243,0.9);
+
+    border:3px solid #81d4fa;
+
+}
+
+.tasks{
+
+    margin-top:25px;
+
+}
+
+.task{
+
+    padding:16px;
+
+    border-radius:18px;
+
+    margin-bottom:12px;
+
+    background:rgba(23, 42, 69, 0.6);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    border:1px solid rgba(255,255,255,0.05);
+
+    box-shadow:
+        0 8px 20px rgba(0,0,0,0.3);
+
+}
+
+.task-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.circle{
+
+    width:16px;
+
+    height:16px;
+
+    border-radius:50%;
+
+}
+
+.gold{
+
+    background:#FFD700;
+
+}
+
+.silver{
+
+    background:#C0C0C0;
+
+}
+
+.yellow{
+
+    background:#FFFF00;
+
+}
+
+.purple{
+
+    background:#800080;
+
+}
+
+.red{
+
+    background:#ff1744;
+
+}
+
+.fab{
+
+    position:fixed;
+
+    right:25px;
+
+    bottom:25px;
+
+    width:72px;
+
+    height:72px;
+
+    border-radius:50%;
+
+    background:linear-gradient(
+        145deg,
+        #FFD700,
+        #ffb700
+    );
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    color:black;
+
+    font-size:40px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 12px 35px rgba(255,215,0,0.45);
+
+    z-index:50;
+
+}
+
+.modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(2, 12, 27, 0.85);
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    z-index:100;
+
+}
+
+.modal-content{
+
+    width:90%;
+
+    max-width:420px;
+
+    background:#0a192f;
+
+    padding:26px;
+
+    border-radius:28px;
+
+    border: 1px solid rgba(255, 255, 255, 0.05);
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,0.6);
+
+}
+
+.modal-content h2{
+
+    margin-bottom:15px;
+
+}
+
+input,
+select{
+
+    width:100%;
+
+    margin-top:12px;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#172a45;
+
+    color:white;
+
+    font-size:15px;
+
+}
+
+.save{
+
+    margin-top:18px;
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:16px;
+
+    background:linear-gradient(
+        145deg,
+        #FFD700,
+        #ffb700
+    );
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    color:black;
+
+    font-size:16px;
+
+}
+
+.empty{
+
+    opacity:0.6;
+
+    text-align:center;
+
+    margin-top:15px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="top">
+
+    <div class="clock" id="clock"></div>
+
+    <div class="date" id="fullDate"></div>
+
+</div>
+
+<div class="card">
+
+    <div class="calendar-header">
+
+        <button onclick="prevMonth()">
+            ❮
+        </button>
+
+        <div class="month" id="monthTitle"></div>
+
+        <button onclick="nextMonth()">
+            ❯
+        </button>
+
+    </div>
+
+    <div class="weekdays">
+
+        <div>DOM</div>
+        <div>SEG</div>
+        <div>TER</div>
+        <div>QUA</div>
+        <div>QUI</div>
+        <div>SEX</div>
+        <div>SÁB</div>
+
+    </div>
+
+    <div class="days" id="calendarDays"></div>
+
+    <div class="tasks" id="tasks"></div>
+
+</div>
+
+</div>
+
+<div class="fab" onclick="openModal()">
++
+</div>
+
+<div class="modal" id="modal">
+
+<div class="modal-content">
+
+    <h2>Novo Evento</h2>
+
+    <input type="date" id="eventDate">
+
+    <input type="time" id="eventTime">
+
+    <select id="eventType">
+
+        <option value="yellow">
+            Audiência
+        </option>
+
+        <option value="purple">
+            Outros Eventos
+        </option>
+
+    </select>
+
+    <input
+        type="text"
+        id="eventTitle"
+        placeholder="Descrição do evento"
+    >
+
+    <button
+        class="save"
+        onclick="saveEvent()"
+    >
+        Salvar Evento
+    </button>
+
+</div>
+
+</div>
+
+<script>
+
+////////////////////////////////////////
+// RELÓGIO
+////////////////////////////////////////
+
+function updateClock(){
+
+    const now = new Date();
+
+    document.getElementById('clock').innerHTML =
+        now.toLocaleTimeString(
+            'pt-BR',
+            {
+                hour:'2-digit',
+                minute:'2-digit'
+            }
+        );
+
+    document.getElementById('fullDate').innerHTML =
+        now.toLocaleDateString(
+            'pt-BR',
+            {
+                weekday:'long',
+                day:'numeric',
+                month:'long'
+            }
+        );
+
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+////////////////////////////////////////
+// ESCALA
+////////////////////////////////////////
+
+// REFERÊNCIA:
+// 27/05/2025
+// 07h às 19h = SERVIÇO DIA
+
+const referenceDate =
+new Date(2025,4,27);
+
+function getServiceType(date){
+
+    const diff =
+    Math.floor(
+        (date-referenceDate)
+        /
+        (1000*60*60*24)
+    );
+
+    const cycle = diff % 5;
+
+    if(cycle===0){
+
+        return 'dia';
+
+    }
+
+    if(cycle===1){
+
+        return 'noite';
+
+    }
+
+    return 'folga';
+
+}
+
+////////////////////////////////////////
+// EVENTOS
+////////////////////////////////////////
+
+let events =
+JSON.parse(
+    localStorage.getItem('events')
+)
+|| [];
+
+////////////////////////////////////////
+// CALENDÁRIO
+////////////////////////////////////////
+
+let currentDate = new Date();
+
+const calendarDays =
+document.getElementById('calendarDays');
+
+function renderCalendar(){
+
+    calendarDays.innerHTML='';
+
+    const year =
+    currentDate.getFullYear();
+
+    const month =
+    currentDate.getMonth();
+
+    const firstDay =
+    new Date(year,month,1).getDay();
+
+    const totalDays =
+    new Date(year,month+1,0).getDate();
+
+    const monthNames = [
+
+        'Janeiro',
+        'Fevereiro',
+        'Março',
+        'Abril',
+        'Maio',
+        'Junho',
+        'Julho',
+        'Agosto',
+        'Setembro',
+        'Outubro',
+        'Novembro',
+        'Dezembro'
+
+    ];
+
+    document.getElementById('monthTitle').innerHTML =
+    `${monthNames[month]} ${year}`;
+
+    ////////////////////////////////////////
+    // ESPAÇOS VAZIOS
+    ////////////////////////////////////////
+
+    for(let i=0;i<firstDay;i++){
+
+        const empty =
+        document.createElement('div');
+
+        calendarDays.appendChild(empty);
+
+    }
+
+    ////////////////////////////////////////
+    // DIAS
+    ////////////////////////////////////////
+
+    for(let day=1;day<=totalDays;day++){
+
+        const date =
+        new Date(year,month,day);
+
+        const formatted =
+        date.toISOString().split('T')[0];
+
+        const div =
+        document.createElement('div');
+
+        div.className='day';
+
+        const circle =
+        document.createElement('div');
+
+        circle.className='day-number';
+
+        circle.innerHTML=day;
+
+        ////////////////////////////////////////
+        // HOJE
+        ////////////////////////////////////////
+
+        const today = new Date();
+
+        if(
+            day===today.getDate()
+            &&
+            month===today.getMonth()
+            &&
+            year===today.getFullYear()
+        ){
+
+            circle.classList.add('today');
+
+        }
+
+        ////////////////////////////////////////
+        // ESCALA AUTOMÁTICA
+        ////////////////////////////////////////
+
+        const service =
+        getServiceType(date);
+
+        if(service==='dia'){
+
+            circle.style.background =
+            'linear-gradient(145deg,#FFD700,#ffb700)';
+
+            circle.style.color='black';
+
+            circle.style.fontWeight='700';
+
+            circle.style.boxShadow =
+            '0 0 18px rgba(255,215,0,0.75)';
+
+        }
+
+        if(service==='noite'){
+
+            circle.style.background =
+            'linear-gradient(145deg,#d9d9d9,#9e9e9e)';
+
+            circle.style.color='black';
+
+            circle.style.fontWeight='700';
+
+            circle.style.boxShadow =
+            '0 0 18px rgba(255,255,255,0.45)';
+
+        }
+
+        ////////////////////////////////////////
+        // EVENTOS MANUAIS
+        ////////////////////////////////////////
+
+        const hasEvent =
+        events.some(
+            e=>e.date===formatted
+        );
+
+        if(hasEvent){
+
+            circle.style.background =
+            'linear-gradient(145deg,#ff1744,#b00020)';
+
+            circle.style.color='white';
+
+            circle.style.fontWeight='700';
+
+            circle.style.boxShadow =
+            '0 0 20px rgba(255,23,68,0.9)';
+
+        }
+
+        ////////////////////////////////////////
+        // HOJE PRIORIDADE
+        ////////////////////////////////////////
+
+        if(
+            day===today.getDate()
+            &&
+            month===today.getMonth()
+            &&
+            year===today.getFullYear()
+        ){
+
+            circle.style.border =
+            '3px solid #81d4fa';
+
+        }
+
+        ////////////////////////////////////////
+        // CLICK
+        ////////////////////////////////////////
+
+        div.onclick=()=>{
+
+            showTasks(date);
+
+        };
+
+        div.appendChild(circle);
+
+        calendarDays.appendChild(div);
+
+    }
+
+}
+
+renderCalendar();
+
+////////////////////////////////////////
+// NAVEGAÇÃO
+////////////////////////////////////////
+
+function prevMonth(){
+
+    currentDate.setMonth(
+        currentDate.getMonth()-1
+    );
+
+    renderCalendar();
+
+}
+
+function nextMonth(){
+
+    currentDate.setMonth(
+        currentDate.getMonth()+1
+    );
+
+    renderCalendar();
+
+}
+
+////////////////////////////////////////
+// MOSTRAR TAREFAS
+////////////////////////////////////////
+
+function showTasks(date){
+
+    const tasks =
+    document.getElementById('tasks');
+
+    tasks.innerHTML='';
+
+    const formatted =
+    date.toISOString().split('T')[0];
+
+    ////////////////////////////////////////
+    // PLANTÃO AUTOMÁTICO
+    ////////////////////////////////////////
+
+    const service =
+    getServiceType(date);
+
+    if(service==='dia'){
+
+        tasks.innerHTML += `
+
+        <div class="task">
+
+            <div class="task-left">
+
+                <div class="circle gold"></div>
+
+                <div>
+
+                    ☀️ Serviço Diurno
+
+                    <br>
+
+                    <small>
+                        07h às 19h
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+
+    if(service==='noite'){
+
+        tasks.innerHTML += `
+
+        <div class="task">
+
+            <div class="task-left">
+
+                <div class="circle silver"></div>
+
+                <div>
+
+                    🌙 Serviço Noturno
+
+                    <br>
+
+                    <small>
+                        19h às 07h
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+
+    ////////////////////////////////////////
+    // EVENTOS MANUAIS
+    ////////////////////////////////////////
+
+    const dayEvents =
+    events.filter(
+        e=>e.date===formatted
+    );
+
+    dayEvents.forEach(event=>{
+
+        tasks.innerHTML += `
+
+        <div class="task">
+
+            <div class="task-left">
+
+                <div class="circle red"></div>
+
+                <div>
+
+                    ${event.title}
+
+                    <br>
+
+                    <small>
+                        ${event.time}
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    ////////////////////////////////////////
+    // VAZIO
+    ////////////////////////////////////////
+
+    if(
+        service==='folga'
+        &&
+        dayEvents.length===0
+    ){
+
+        tasks.innerHTML =
+        `
+        <div class="empty">
+
+            😴 Nenhum evento nesta data
+
+        </div>
+        `;
+
+    }
+
+}
+
+////////////////////////////////////////
+// MODAL
+////////////////////////////////////////
+
+function openModal(){
+
+    document.getElementById('modal')
+    .style.display='flex';
+
+}
+
+function closeModal(){
+
+    document.getElementById('modal')
+    .style.display='none';
+
+}
+
+////////////////////////////////////////
+// SALVAR EVENTO
+////////////////////////////////////////
+
+function saveEvent(){
+
+    const event = {
+
+        date:
+        document.getElementById('eventDate').value,
+
+        time:
+        document.getElementById('eventTime').value,
+
+        type:
+        document.getElementById('eventType').value,
+
+        title:
+        document.getElementById('eventTitle').value
+
+    };
+
+    events.push(event);
+
+    localStorage.setItem(
+        'events',
+        JSON.stringify(events)
+    );
+
+    renderCalendar();
+
+    showTasks(
+        new Date(event.date)
+    );
+
+    closeModal();
+
+}
+
+////////////////////////////////////////
+// FECHAR MODAL AO CLICAR FORA
+////////////////////////////////////////
+
+window.onclick=function(e){
+
+    const modal =
+    document.getElementById('modal');
+
+    if(e.target===modal){
+
+        closeModal();
+
+    }
+
+}
+
+////////////////////////////////////////
+// ABRIR HOJE
+////////////////////////////////////////
+
+showTasks(new Date());
+
+</script>
+
+</body>
+</html>
